@@ -61,10 +61,15 @@ return {
       end,
     })
 
-    -- capabilities
+    -- capabilities (standardize offset encoding to avoid warnings)
     local capabilities = cmp_nvim_lsp.default_capabilities()
-    -- fix Neovim 0.10+ position encoding warning when multiple clients attach
-    capabilities.offsetEncoding = { "utf-16", "utf-8" }
+    local PREFERRED_OFFSET = "utf-16" -- <- pick one; utf-16 is safest across servers
+    capabilities.offsetEncoding = { PREFERRED_OFFSET }
+
+    -- ensure each client uses the same encoding
+    local function force_offset_encoding(client)
+      client.offset_encoding = PREFERRED_OFFSET
+    end
 
     -- diagnostic signs (prefer new API, fallback to legacy if unavailable)
     do
@@ -89,6 +94,7 @@ return {
         function(server_name)
           lspconfig[server_name].setup({
             capabilities = capabilities,
+            on_init = force_offset_encoding,
           })
         end,
 
@@ -96,6 +102,7 @@ return {
         ["svelte"] = function()
           lspconfig.svelte.setup({
             capabilities = capabilities,
+            on_init = force_offset_encoding,
             on_attach = function(client, _)
               vim.api.nvim_create_autocmd("BufWritePost", {
                 pattern = { "*.js", "*.ts" },
@@ -111,6 +118,7 @@ return {
         ["graphql"] = function()
           lspconfig.graphql.setup({
             capabilities = capabilities,
+            on_init = force_offset_encoding,
             filetypes = { "graphql", "gql", "svelte", "typescriptreact", "javascriptreact" },
           })
         end,
@@ -119,6 +127,7 @@ return {
         ["emmet_ls"] = function()
           lspconfig.emmet_ls.setup({
             capabilities = capabilities,
+            on_init = force_offset_encoding,
             filetypes = { "html", "typescriptreact", "javascriptreact", "css", "sass", "scss", "less", "svelte" },
           })
         end,
@@ -127,6 +136,7 @@ return {
         ["lua_ls"] = function()
           lspconfig.lua_ls.setup({
             capabilities = capabilities,
+            on_init = force_offset_encoding,
             settings = {
               Lua = {
                 diagnostics = { globals = { "vim" } },

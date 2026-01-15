@@ -18,7 +18,11 @@ return {
       },
 
       view = {
-        width = 35,
+        width = {
+          min = 35,
+          max = 50,
+          padding = 2,
+        },
         relativenumber = true,
       },
 

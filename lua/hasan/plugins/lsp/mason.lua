@@ -42,11 +42,9 @@ return {
 
     mason_tool_installer.setup({
       ensure_installed = {
+        "ruff", -- python formatter & linter (replaces isort, black, pylint)
         -- "prettier", -- prettier formatter
         -- "stylua", -- lua formatter
-        -- "isort", -- python formatter
-        -- "black", -- python formatter
-        -- "pylint",
         -- "eslint_d",
       },
     })
